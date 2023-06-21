@@ -1,0 +1,22 @@
+{
+  "pluginAlias": "JukeAudioPlugin",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "required": true,
+        "default": "Juke Audio"
+      },
+      "password": {
+        "title": "Juke Audio Device Password",
+        "type": "string",
+        "required": false,
+        "default": "Admin"
+      }
+    }
+  }
+}
