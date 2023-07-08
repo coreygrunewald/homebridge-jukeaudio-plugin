@@ -7,6 +7,11 @@ export class JukeAudio {
     log: Logger;
 
     constructor(password: string, log: Logger) {
+        if (password == '') {
+            log.info('No Juke password was provided...using Juke default password');
+            password = "Admin";
+        }
+
         let bufferObj = Buffer.from("Admin:" + password, "utf8");
         this.authHeader = "Basic " + bufferObj.toString('base64');
         this.log = log;
@@ -18,7 +23,7 @@ export class JukeAudio {
      * @return {InputIDs} List of all input ID
      */
     async getInputIDs(): Promise<InputIDs> {
-        const url = 'http://juke.local/api/v1/inputs/';
+        const url = 'http://juke.local/api/v2/inputs/';
         this.log.debug("[GET] => ", url);
 
         const response = await fetch(url, {
@@ -39,7 +44,7 @@ export class JukeAudio {
      * @return {InputConfig} The configuration for the input
      */
     async getInputConfig(id: string): Promise<InputConfig> {
-        const url = 'http://juke.local/api/v1/inputs/' + id;
+        const url = 'http://juke.local/api/v2/inputs/' + id;
         this.log.debug("[GET] => ", url);
 
         const response = await fetch(url, {
@@ -98,6 +103,8 @@ export class JukeAudio {
             zones[_i].id = zones[_i].device_id + '-Z' + + zones[_i].index 
         }
 
+        this.log.debug("Retrieved " + zones.length + " zones from Juke server");
+
         return zones;
     }
 
@@ -107,7 +114,7 @@ export class JukeAudio {
      * @return {ZoneConfiguration} The configuration for the zone
      */
     async getZoneConfig(id: string): Promise<ZoneConfiguration> {
-        const url = 'http://juke.local/api/v1/zones/' + id;
+        const url = 'http://juke.local/api/v2/zones/' + id;
         this.log.debug("[GET] => ", url);
 
         const response = await fetch(url, {
@@ -127,7 +134,7 @@ export class JukeAudio {
      * @return {String} The ID of the device
      */
     async getServerDeviceID(): Promise<string> {
-        const url = 'http://juke.local/api/v1/devices/server';
+        const url = 'http://juke.local/api/v2/devices/server';
         this.log.debug("[GET] => ", url);
 
         const response = await fetch(url, {
@@ -155,7 +162,7 @@ export class JukeAudio {
      * @return {DeviceAttributes} The attributes of the device
      */
     async getDeviceAttributes(deviceID: string): Promise<DeviceAttributes> {
-        const url = 'http://juke.local/ap1/v1/devices/' + deviceID + '/attributes';
+        const url = 'http://juke.local/api/v2/devices/' + deviceID + '/attributes';
         this.log.debug("[GET] => ", url);
 
         const response = await fetch(url, {
@@ -166,7 +173,7 @@ export class JukeAudio {
             },}
         )
         
-        const data = await response.json();
+        const data = await response.json();        
         return data as DeviceAttributes;
     }
 
@@ -176,7 +183,7 @@ export class JukeAudio {
      * @param  {Number} volume The level (0-100) to set the volume to
      */
     async setZoneVolume(zoneID: string, volume: number) {
-        const url = 'http://juke.local/api/v1/zones/' + zoneID + '/volume';
+        const url = 'http://juke.local/api/v2/zones/' + zoneID + '/volume';
         this.log.debug("[PUT] => ", url);
         let body = 'volume=' + volume.toString();
 

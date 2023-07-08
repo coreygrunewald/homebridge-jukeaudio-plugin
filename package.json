@@ -1,7 +1,7 @@
 {
   "private": true,
   "displayName": "Juke Audio",
-  "name": "homebridge-jukeaudio-plugin",
+  "name": "homebridge-jukeaudio",
   "version": "1.0.0",
   "description": "Integration with Juke Audio Multi-Room Amplifiers",
   "license": "Apache-2.0",
