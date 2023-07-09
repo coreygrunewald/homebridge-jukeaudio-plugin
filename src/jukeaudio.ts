@@ -199,6 +199,7 @@ export class JukeAudio {
         )
         
         const data = await response;
+        this.log.debug(data);
 
         return ""
     }
