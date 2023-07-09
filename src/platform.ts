@@ -41,6 +41,7 @@ export class JukeAudioHomebridgePlatform implements DynamicPlatformPlugin {
    */
   configureAccessory(accessory: PlatformAccessory) {
     // Do Nothing
+    this.log.debug('restoring cached accessory: ' + accessory.displayName);
   }
 
   /**
@@ -56,7 +57,7 @@ export class JukeAudioHomebridgePlatform implements DynamicPlatformPlugin {
 
     jukeAudio.getZones().then(zones => {
       // loop over the discovered devices and register each one if it has not already been registered
-      for (let zone of zones) {
+      for (const zone of zones) {
         this.log.debug("Configuring zone " + zone.name + " (" + zone.id + ")...");
 
         // generate a unique id for the accessory -- we use the zoneID

@@ -2,7 +2,6 @@ import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 
 import { JukeAudioHomebridgePlatform } from './platform';
 import { JukeAudio, Zone } from './jukeaudio';
-import { PLUGIN_NAME } from './settings';
 
 interface ZoneState {
   status: CharacteristicValue,
@@ -34,11 +33,13 @@ export class ZonePlatformAccessory {
     };
 
     // set accessory information
-    this.accessory.getService(this.platform.Service.AccessoryInformation)!
-      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Juke Audio')
-      .setCharacteristic(this.platform.Characteristic.Model, 'Juke-Zone')
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.getFirmwareVersion(zone.device_id))
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, zone.id);
+    const svc = this.accessory.getService(this.platform.Service.AccessoryInformation);
+    if (svc) {
+      svc.setCharacteristic(this.platform.Characteristic.Manufacturer, 'Juke Audio')
+      svc.setCharacteristic(this.platform.Characteristic.Model, 'Juke-Zone')
+      svc.setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.getFirmwareVersion(zone.device_id))
+      svc.setCharacteristic(this.platform.Characteristic.SerialNumber, zone.id);
+    }
 
     // Get the Speaker service if it exists, otherwise create a new Speaker service
     // you can create multiple services for each accessory
@@ -172,8 +173,8 @@ export class ZonePlatformAccessory {
    * Handle requests to set the "Target Media State" characteristic.  Since Juke Audio Zones
      don't actually support media state changes we will ignore the change request
    */
-  handleTargetMediaStateSet(value: any) {
-    this.platform.log.debug('Triggered SET TargetMediaState:', value);
+  handleTargetMediaStateSet(value: CharacteristicValue) {
+    this.platform.log.debug('Triggered SET TargetMediaState:', value.toString);
   }
 
   getFirmwareVersion(deviceID: string) {

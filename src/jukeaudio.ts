@@ -12,7 +12,7 @@ export class JukeAudio {
             password = "Admin";
         }
 
-        let bufferObj = Buffer.from("Admin:" + password, "utf8");
+        const bufferObj = Buffer.from("Admin:" + password, "utf8");
         this.authHeader = "Basic " + bufferObj.toString('base64');
         this.log = log;
         log.debug("Created reference to JukeAudio")
@@ -96,10 +96,10 @@ export class JukeAudio {
         )
         
         const data = await response.json();
-        let zones = data as Zone[]
+        const zones = data as Zone[]
 
         // Create the zone id since it isn't explicity returned from the server
-        for (var _i = 0; _i < zones.length; _i++) {
+        for (let _i = 0; _i < zones.length; _i++) {
             zones[_i].id = zones[_i].device_id + '-Z' + + zones[_i].index 
         }
 
@@ -185,9 +185,9 @@ export class JukeAudio {
     async setZoneVolume(zoneID: string, volume: number) {
         const url = 'http://juke.local/api/v2/zones/' + zoneID + '/volume';
         this.log.debug("[PUT] => ", url);
-        let body = 'volume=' + volume.toString();
+        const body = 'volume=' + volume.toString();
 
-        let response = await fetch(url, {
+        const response = await fetch(url, {
             method: 'PUT',
             headers: {
             'accept': 'application/json',
@@ -198,12 +198,7 @@ export class JukeAudio {
           }
         )
         
-        try {
-            const data = await response.json();
-            return data
-        } catch(error) {
-
-        } 
+        const data = await response;
 
         return ""
     }

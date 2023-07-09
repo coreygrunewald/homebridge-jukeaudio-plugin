@@ -1,11 +1,9 @@
-import { API } from 'homebridge';
-
-import { PLATFORM_NAME } from './settings';
-import { JukeAudioHomebridgePlatform } from './platform';
-
+import { API } from 'homebridge'
+import { PLATFORM_NAME } from './settings'
+import { JukeAudioHomebridgePlatform } from './platform'
 /**
  * This method registers the platform with Homebridge
  */
 export = (api: API) => {
   api.registerPlatform(PLATFORM_NAME, JukeAudioHomebridgePlatform);
-};
+}
