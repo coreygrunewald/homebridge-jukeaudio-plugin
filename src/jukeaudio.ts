@@ -183,7 +183,12 @@ export class JukeAudio {
      * @param  {Number} volume The level (0-100) to set the volume to
      */
     async setZoneVolume(zoneID: string, volume: number) {
-        const url = 'http://juke.local/api/v2/zones/' + zoneID + '/volume';
+        // There is a bug in the v2.0 version of the API that has an off-by-one
+        // error. Therefore if you are trying to set the volume for a zone you 
+        // actually need to set the zone below it.
+        const correctedZoneID = this.getOffByOneZoneCorrection(zoneID);
+
+        const url = 'http://juke.local/api/v2/zones/' + correctedZoneID + '/volume';
         this.log.debug("[PUT] => ", url);
         const body = 'volume=' + volume.toString();
 
@@ -203,7 +208,15 @@ export class JukeAudio {
 
         return ""
     }
+
+    getOffByOneZoneCorrection(zoneID: string) {
+        // // 8D4F75-607-Z3
+        const zoneNumStr = zoneID.slice(-1);
+        const zoneNum: number = +zoneNumStr;
+        return zoneID.substring(0, zoneID.length - 1) + (zoneNum - 1);
+    }
 }
+
 
 export interface Zone {
     id: string,

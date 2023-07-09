@@ -132,9 +132,33 @@ export class ZonePlatformAccessory {
   }
 
   async setVolume(value: CharacteristicValue) {
-    this.jukeAudio.setZoneVolume(this.zone.id, value as number);
+    this.jukeAudio.getZoneConfig(this.zone.id)
+    .then(config => {
+      // If the volume is 100 then we'll treat this as a Pico Volume-Up request and if its 0 we'll
+      // treat as a Pic Volume-Down request. Otherwise, let the volume bet set to the desired value.
+      const requestedVolume = value as number;
+      let desiredVolume = requestedVolume;
+      
+      switch (requestedVolume) {
+        case 100:
+          desiredVolume = config.volume + 10;
+          break;
+        case 0:
+          desiredVolume = config.volume - 10;
+          break;
+      }
 
-    this.platform.log.info('Set Volume for ' + this.zone.name + ' ->', value);
+      if (desiredVolume > 100) {
+        desiredVolume = 100
+      }
+
+      if (desiredVolume < 0) {
+        desiredVolume = 0;
+      }
+
+      this.jukeAudio.setZoneVolume(this.zone.id, desiredVolume);
+      this.platform.log.info('Set Volume for ' + this.zone.name + ' ->', value);
+    })
   }
 
   async getVolume(): Promise<CharacteristicValue> {
