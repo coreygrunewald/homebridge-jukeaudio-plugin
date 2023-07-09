@@ -113,7 +113,7 @@ export class ZonePlatformAccessory {
         this.jukeAudio.setZoneVolume(this.zone.id, desiredVolume);
       })
 
-    this.platform.log.debug('Set Characteristic Muted ->', value, 'LastMutedVolume ->'), this.zoneState.lastMutedVolume;
+    this.platform.log.debug('Set Muted for ' + this.zone.name + ' ->', value, 'LastMutedVolume ->'), this.zoneState.lastMutedVolume;
   }
 
   async getMuted(): Promise<CharacteristicValue> {
@@ -125,7 +125,7 @@ export class ZonePlatformAccessory {
         isMuted = true;
       }
 
-      this.platform.log.debug('Get Characteristic Muted ->', isMuted, 'LastMutedVolume ->'), this.zoneState.lastMutedVolume;
+      this.platform.log.info('Get Muted for ' + this.zone.name + ' ->', isMuted, 'LastMutedVolume ->'), this.zoneState.lastMutedVolume;
     })
 
     return false;
@@ -134,14 +134,14 @@ export class ZonePlatformAccessory {
   async setVolume(value: CharacteristicValue) {
     this.jukeAudio.setZoneVolume(this.zone.id, value as number);
 
-    this.platform.log.debug('Set Characteristic Volume ->', value);
+    this.platform.log.info('Set Volume for ' + this.zone.name + ' ->', value);
   }
 
   async getVolume(): Promise<CharacteristicValue> {
     let volume = 0;
     this.jukeAudio.getZoneConfig(this.zone.id)
       .then(config => {
-        this.platform.log.debug('Get Characteristic Volume ->', config.volume);
+        this.platform.log.info('Get Volume for ' + this.zone.name + ' ->', config.volume);
         volume = config.volume;
       })
       .finally(() => { return volume } ) 
