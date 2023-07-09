@@ -1,169 +1,60 @@
+# Homebridge Juke Audio Plugin
 
-<p align="center">
+IMPORTANT: THIS IS AN UNRELEASED BETA VERSION OF THIS PLUGIN. USE AT YOUR OWN RISK!
 
-<img src="https://github.com/homebridge/branding/raw/master/logos/homebridge-wordmark-logo-vertical.png" width="150">
+This Homebridge plugin controls Juke Audio Multi-Room Streaming Amplifiers (https://jukeaudio.com/). The Juke amplifiers allow wireless streaming from devices such as a phone to the amplifier. The amplifier then distributes the audio to a series of speakers.
 
-</p>
+The Juke Audio plugin creates an Apple Homekit "Speaker" for each amplifier zone. This allows you to perform the following actions:
+- Change the volume up or down
+- Mute the volume
+- Change zone (i.e., speaker) source
 
+Note that because there is not a direct correllation between Jukes features and an Apple Homekit Speaker, not all functionality is supported. For example, it is not possible to pause/play an audio source.
 
-# Homebridge Platform Plugin Template
+The initial intention of this plugin was to interface it with a low-cost Lutron Pico Smart Audio Remote (https://www.casetawireless.com/us/en/products/pico-remotes). Placing a Pico audio remote on the wall where speakers are located allows easy volume control of the speakers.  Otherwise, a phone, tablet or computer is required to set the volume.  The Lutron Pico has a HomeBridge plugin (Lutron Caseta LEAP) you can install (https://github.com/thenewwazoo/homebridge-lutron-caseta-leap#readme) and configure to control the Juke.
 
-This is a template Homebridge platform plugin and can be used as a base to help you get started developing your own plugin.
+## Installation & Plugin Configuration
+Install the plugin as you would any other Homebridge plugin.
 
-This template should be used in conjunction with the [developer documentation](https://developers.homebridge.io/). A full list of all supported service types, and their characteristics is available on this site.
-
-## Clone As Template
-
-Click the link below to create a new GitHub Repository using this template, or click the *Use This Template* button above.
-
-<span align="center">
-
-### [Create New Repository From Template](https://github.com/homebridge/homebridge-plugin-template/generate)
-
-</span>
-
-## Setup Development Environment
-
-To develop Homebridge plugins you must have Node.js 12 or later installed, and a modern code editor such as [VS Code](https://code.visualstudio.com/). This plugin template uses [TypeScript](https://www.typescriptlang.org/) to make development easier and comes with pre-configured settings for [VS Code](https://code.visualstudio.com/) and ESLint. If you are using VS Code install these extensions:
-
-* [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-
-## Install Development Dependencies
-
-Using a terminal, navigate to the project folder and run this command to install the development dependencies:
-
-```
-npm install
-```
-
-## Update package.json
-
-Open the [`package.json`](./package.json) and change the following attributes:
-
-* `name` - this should be prefixed with `homebridge-` or `@username/homebridge-` and contain no spaces or special characters apart from a dashes
-* `displayName` - this is the "nice" name displayed in the Homebridge UI
-* `repository.url` - Link to your GitHub repo
-* `bugs.url` - Link to your GitHub repo issues page
-
-When you are ready to publish the plugin you should set `private` to false, or remove the attribute entirely.
-
-## Update Plugin Defaults
-
-Open the [`src/settings.ts`](./src/settings.ts) file and change the default values:
-
-* `PLATFORM_NAME` - Set this to be the name of your platform. This is the name of the platform that users will use to register the plugin in the Homebridge `config.json`.
-* `PLUGIN_NAME` - Set this to be the same name you set in the [`package.json`](./package.json) file. 
-
-Open the [`config.schema.json`](./config.schema.json) file and change the following attribute:
-
-* `pluginAlias` - set this to match the `PLATFORM_NAME` you defined in the previous step.
-
-## Build Plugin
-
-TypeScript needs to be compiled into JavaScript before it can run. The following command will compile the contents of your [`src`](./src) directory and put the resulting code into the `dist` folder.
-
-```
-npm run build
-```
-
-## Link To Homebridge
-
-Run this command so your global install of Homebridge can discover the plugin in your development environment:
-
-```
-npm link
-```
-
-You can now start Homebridge, use the `-D` flag so you can see debug log messages in your plugin:
-
-```
-homebridge -D
-```
-
-## Watch For Changes and Build Automatically
-
-If you want to have your code compile automatically as you make changes, and restart Homebridge automatically between changes, you first need to add your plugin as a platform in `~/.homebridge/config.json`:
-```
-{
-...
-    "platforms": [
+Use the following configuration:
+`
         {
-            "name": "Config",
-            "port": 8581,
-            "platform": "config"
-        },
-        {
-            "name": "<PLUGIN_NAME>",
-            //... any other options, as listed in config.schema.json ...
-            "platform": "<PLATFORM_NAME>"
+            "name": "Juke",
+            "platform": "JukeAudioPlugin",
+            "password": "Admin"
         }
-    ]
-}
-```
+`
 
-and then you can run:
+Juke publishes it's local device name on the network as 'juke.local' so it should find the device automatically. Specify the password (Jukes default password is 'Admin'). Keep the 'name' and 'platform' values the same as shown above.
 
-```
-npm run watch
-```
+After you change the configuration, restart Homebridge.
 
-This will launch an instance of Homebridge in debug mode which will restart every time you make a change to the source code. It will load the config stored in the default location under `~/.homebridge`. You may need to stop other running instances of Homebridge while using this command to prevent conflicts. You can adjust the Homebridge startup command in the [`nodemon.json`](./nodemon.json) file.
+## Apple Homekit Configuration
+Apple treats Homekit Speakers differently than most other devices and as a result there are some additional steps that must be done in order for them to appear in Homekit.
 
-## Customise Plugin
+Go to the Homebridge 'Status' page and inspect the log output. You should see something like the following for each Juke Zone you have. Take note of the 'Setup Code' referenced for each of the Speaker Zones.
 
-You can now start customising the plugin template to suit your requirements.
+`
+[7/8/2023, 11:20:52 AM] [Juke] Registering Zone:  Patio...
+[7/8/2023, 11:20:52 AM] [Juke] Zone Registered: Patio (8D4F75-607-Z0)
+[7/8/2023, 11:20:52 AM] [Juke] Registering Zone:  Upstairs Hall...
+[7/8/2023, 11:20:52 AM] [Juke] Zone Registered: Upstairs Hall (8D4F75-607-Z1)
+[7/8/2023, 11:20:52 AM] [Juke] Registering Zone:  Living Room...
+[7/8/2023, 11:20:52 AM] [Juke] Zone Registered: Living Room (8D4F75-607-Z2)
+[7/8/2023, 11:20:52 AM] Patio DFBA is running on port 49490.
+[7/8/2023, 11:20:52 AM] Please add [Patio DFBA] manually in Home app. Setup Code: 407-54-639
+[7/8/2023, 11:20:52 AM] Upstairs Hall A642 is running on port 49491.
+[7/8/2023, 11:20:52 AM] Please add [Upstairs Hall A642] manually in Home app. Setup Code: 407-54-639
+[7/8/2023, 11:20:52 AM] Living Room 1463 is running on port 49492.
+[7/8/2023, 11:20:52 AM] Please add [Living Room 1463] manually in Home app. Setup Code: 407-54-639
+`
 
-* [`src/platform.ts`](./src/platform.ts) - this is where your device setup and discovery should go.
-* [`src/platformAccessory.ts`](./src/platformAccessory.ts) - this is where your accessory control logic should go, you can rename or create multiple instances of this file for each accessory type you need to implement as part of your platform plugin. You can refer to the [developer documentation](https://developers.homebridge.io/) to see what characteristics you need to implement for each service type.
-* [`config.schema.json`](./config.schema.json) - update the config schema to match the config you expect from the user. See the [Plugin Config Schema Documentation](https://developers.homebridge.io/#/config-schema).
-
-## Versioning Your Plugin
-
-Given a version number `MAJOR`.`MINOR`.`PATCH`, such as `1.4.3`, increment the:
-
-1. **MAJOR** version when you make breaking changes to your plugin,
-2. **MINOR** version when you add functionality in a backwards compatible manner, and
-3. **PATCH** version when you make backwards compatible bug fixes.
-
-You can use the `npm version` command to help you with this:
-
-```bash
-# major update / breaking changes
-npm version major
-
-# minor update / new features
-npm version update
-
-# patch / bugfixes
-npm version patch
-```
-
-## Publish Package
-
-When you are ready to publish your plugin to [npm](https://www.npmjs.com/), make sure you have removed the `private` attribute from the [`package.json`](./package.json) file then run:
-
-```
-npm publish
-```
-
-If you are publishing a scoped plugin, i.e. `@username/homebridge-xxx` you will need to add `--access=public` to command the first time you publish.
-
-#### Publishing Beta Versions
-
-You can publish *beta* versions of your plugin for other users to test before you release it to everyone.
-
-```bash
-# create a new pre-release version (eg. 2.1.0-beta.1)
-npm version prepatch --preid beta
-
-# publish to @beta
-npm publish --tag=beta
-```
-
-Users can then install the  *beta* version by appending `@beta` to the install command, for example:
-
-```
-sudo npm install -g homebridge-example-plugin@beta
-```
-
-
+### Add Speaker in the Home App
+1. Open the Home App on your phone
+2. Choose the '+' button at the top and choose 'Add Accessory'
+3. Choose the 'More options...' link
+4. If the accessory is listed then select it, otherwise choose the button that says "My Accessory Isn't Shown Here"
+5. Choose the option for "Enter Code" manually
+6. Enter the Setup Code that was listed in the Homebridge logs
+7. Complete the setup for the speaker zone
+8. Repeat the process for each Speaker zone

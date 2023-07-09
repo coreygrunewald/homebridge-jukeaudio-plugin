@@ -1,5 +1,5 @@
 {
-  "private": true,
+  "private": false,
   "displayName": "Juke Audio",
   "name": "homebridge-jukeaudio",
   "version": "1.0.0",
