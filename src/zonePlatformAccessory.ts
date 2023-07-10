@@ -5,7 +5,8 @@ import { JukeAudio, Zone } from './jukeaudio';
 
 interface ZoneState {
   status: CharacteristicValue,
-  lastMutedVolume: number
+  lastVolumeLevel: number,
+  lastVolumeCheckTime: number
 }
 
 /**
@@ -29,7 +30,8 @@ export class ZonePlatformAccessory {
 
     this.zoneState = {
       status: this.platform.Characteristic.CurrentMediaState.PLAY,
-      lastMutedVolume: 10
+      lastVolumeLevel: 10,
+      lastVolumeCheckTime: Date.now()
     };
 
     // set accessory information
@@ -87,7 +89,7 @@ export class ZonePlatformAccessory {
     }
 
     if (zone.percent_volume > 0) {
-      this.zoneState.lastMutedVolume = zone.percent_volume;
+      this.zoneState.lastVolumeLevel = zone.percent_volume;
     }
   }
   /**
@@ -100,10 +102,10 @@ export class ZonePlatformAccessory {
         let desiredVolume = 0;
 
         if (value as boolean) {
-          this.zoneState.lastMutedVolume = config.volume;
+          this.zoneState.lastVolumeLevel = config.volume;
           desiredVolume = 0;
         } else {
-          desiredVolume = this.zoneState.lastMutedVolume;
+          desiredVolume = this.zoneState.lastVolumeLevel;
 
           if (desiredVolume == 0) {
             desiredVolume = 10;
@@ -113,7 +115,7 @@ export class ZonePlatformAccessory {
         this.jukeAudio.setZoneVolume(this.zone.id, desiredVolume);
       })
 
-    this.platform.log.debug('Set Muted for ' + this.zone.name + ' ->', value, 'LastMutedVolume ->'), this.zoneState.lastMutedVolume;
+    this.platform.log.debug('Set Muted for ' + this.zone.name + ' ->', value, 'LastMutedVolume ->'), this.zoneState.lastVolumeLevel;
   }
 
   async getMuted(): Promise<CharacteristicValue> {
@@ -125,44 +127,55 @@ export class ZonePlatformAccessory {
         isMuted = true;
       }
 
-      this.platform.log.info('Get Muted for ' + this.zone.name + ' ->', isMuted, 'LastMutedVolume ->'), this.zoneState.lastMutedVolume;
+      this.platform.log.info('Get Muted for ' + this.zone.name + ' ->', isMuted, 'LastMutedVolume ->'), this.zoneState.lastVolumeLevel;
     })
 
     return false;
   }
 
   async setVolume(value: CharacteristicValue) {
+    const requestedVolume = value as number;
+
+    // If the volume was retrieved less than 10 seconds ago there is no need to retrieve it again
+    if ((this.zoneState.lastVolumeCheckTime + 10000) > Date.now()) {
+      this.setZoneVolume(requestedVolume, this.zoneState.lastVolumeLevel)
+      return
+    }
+
     this.jukeAudio.getZoneConfig(this.zone.id)
     .then(config => {
-      // If the volume is 100 then we'll treat this as a Pico Volume-Up request and if its 0 we'll
-      // treat as a Pic Volume-Down request. Otherwise, let the volume bet set to the desired value.
-      const requestedVolume = value as number;
-      let desiredVolume = requestedVolume;
-
-      this.platform.log.info("current volume: " + config.volume);
-      
-      switch (requestedVolume) {
-        case 100:
-          desiredVolume = config.volume + 10;
-          break;
-        case 0:
-          desiredVolume = config.volume - 10;
-          break;
-      }
-
-      this.platform.log.info("desired volume: " + desiredVolume);
-
-      if (desiredVolume > 100) {
-        desiredVolume = 100
-      }
-
-      if (desiredVolume < 0) {
-        desiredVolume = 0;
-      }
-
-      this.jukeAudio.setZoneVolume(this.zone.id, desiredVolume);
-      this.platform.log.info('Set Volume for ' + this.zone.name + ' ->', value);
+      this.setZoneVolume(requestedVolume, config.volume);
     })
+  }
+
+  async setZoneVolume(requestedVolume: number, currentVolume: number) {
+    let desiredVolume = requestedVolume;
+
+    // If the volume is 100 then we'll treat this as a Pico Volume-Up request and if its 0 we'll
+    // treat as a Pic Volume-Down request. Otherwise, let the volume bet set to the desired value.
+
+    switch (requestedVolume) {
+      case 100:
+        desiredVolume = currentVolume + 10;
+        break;
+      case 0:
+        desiredVolume = currentVolume - 10;
+        break;
+    }
+
+    if (desiredVolume > 100) {
+      desiredVolume = 100
+    }
+
+    if (desiredVolume < 0) {
+      desiredVolume = 0;
+    }
+
+    this.zoneState.lastVolumeLevel = desiredVolume;
+    this.zoneState.lastVolumeCheckTime = Date.now()
+
+    this.jukeAudio.setZoneVolume(this.zone.id, desiredVolume);
+    this.platform.log.info('Set Volume for ' + this.zone.name + ' ->', desiredVolume);
   }
 
   async getVolume(): Promise<CharacteristicValue> {

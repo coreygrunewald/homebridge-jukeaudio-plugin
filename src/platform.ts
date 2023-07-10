@@ -55,6 +55,8 @@ export class JukeAudioHomebridgePlatform implements DynamicPlatformPlugin {
     this.log.info("Discovering JukeAudio Zones...");
     this.log.debug("Existing accessory count: " + this.accessories.length);
 
+    return;
+    
     jukeAudio.getZones().then(zones => {
       // loop over the discovered devices and register each one if it has not already been registered
       for (const zone of zones) {
