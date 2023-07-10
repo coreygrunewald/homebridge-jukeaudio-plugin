@@ -138,6 +138,8 @@ export class ZonePlatformAccessory {
       // treat as a Pic Volume-Down request. Otherwise, let the volume bet set to the desired value.
       const requestedVolume = value as number;
       let desiredVolume = requestedVolume;
+
+      this.platform.log.info("current volume: " + config.volume);
       
       switch (requestedVolume) {
         case 100:
@@ -147,6 +149,8 @@ export class ZonePlatformAccessory {
           desiredVolume = config.volume - 10;
           break;
       }
+
+      this.platform.log.info("desired volume: " + desiredVolume);
 
       if (desiredVolume > 100) {
         desiredVolume = 100
