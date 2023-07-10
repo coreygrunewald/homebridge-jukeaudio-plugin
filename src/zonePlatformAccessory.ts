@@ -127,7 +127,7 @@ export class ZonePlatformAccessory {
         isMuted = true;
       }
 
-      this.platform.log.info('Get Muted for ' + this.zone.name + ' ->', isMuted, 'LastMutedVolume ->'), this.zoneState.lastVolumeLevel;
+      this.platform.log.debug('Get Muted for ' + this.zone.name + ' ->', isMuted, 'LastMutedVolume ->'), this.zoneState.lastVolumeLevel;
     })
 
     return false;
@@ -182,7 +182,7 @@ export class ZonePlatformAccessory {
     let volume = 0;
     this.jukeAudio.getZoneConfig(this.zone.id)
       .then(config => {
-        this.platform.log.info('Get Volume for ' + this.zone.name + ' ->', config.volume);
+        this.platform.log.debug('Get Volume for ' + this.zone.name + ' ->', config.volume);
         volume = config.volume;
       })
       .finally(() => { return volume } ) 
