@@ -1,5 +1,6 @@
 # Homebridge Juke Audio Plugin
 
+
 This Homebridge plugin controls Juke Audio Multi-Room Streaming Amplifiers (https://jukeaudio.com/). The Juke amplifiers allow wireless streaming from devices such as a phone to the amplifier. The amplifier then distributes the audio to a series of speakers.
 
 The Juke Audio plugin creates an Apple Homekit "Speaker" for each amplifier zone. This allows you to perform the following actions:
